@@ -20,6 +20,7 @@ Nodo * CrearListaVacia();
 Nodo * CrearNodo (char *buff, int duracion, int ID);
 void InsertarNodo (Nodo ** start, Nodo * Nodo);
 Nodo * QuitarNodo (Nodo ** start, int ID);
+void MostrarLista (Nodo ** start);
 
 int main ()
 {
@@ -44,19 +45,22 @@ int main ()
         printf("\nDesea agregar otra tarea? (s/n): ");
         scanf("%c", &opcion);
     } while (opcion == 's' || opcion == 'S');
-
+    
     do {
         printf("ingrese el ID de la tarea que fue realizada: ");
         scanf("%d", &idBuscado);
-        Nodo * nodoQuitado = QuitarNodo(&listaPendientes, ID);
+        Nodo * nodoQuitado = QuitarNodo(&listaPendientes, idBuscado);
         InsertarNodo(&listaRealizadas, nodoQuitado);
         
         fflush(stdin);
-        printf("\nDesea pasar otra tarea realizada? (s/n): ");
+        printf("\nDesea pasar otra tarea a realizada? (s/n): ");
         scanf("%c", &opcion);
     } while (opcion == 's' || opcion == 'S');
-
     
+    puts("\nLista de tareas pendientes\n");
+    MostrarLista(&listaPendientes);
+    puts("\nLista de tareas realizadas\n");
+    MostrarLista(&listaRealizadas);
     
     return 0;
 }
@@ -100,4 +104,16 @@ Nodo * QuitarNodo (Nodo ** start, int ID)
         return temp;
     }
     return NULL;
+}
+
+void MostrarLista (Nodo ** start)
+{
+    Nodo * Aux = *start;
+    while (Aux)
+    {
+        printf("ID de la tarea: %d\n", Aux->T.TareaId);
+        printf("Descripcion de la tarea: %s\n", Aux->T.Descripcion);
+        printf("Duracion de la tarea: %d\n", Aux->T.Duracion);
+        Aux = Aux->Siguiente;
+    }
 }
