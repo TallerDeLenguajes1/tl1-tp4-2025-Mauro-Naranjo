@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 typedef struct 
 {
@@ -21,12 +20,16 @@ Nodo * CrearNodo (char *buff, int duracion, int ID);
 void InsertarNodo (Nodo ** start, Nodo * Nodo);
 Nodo * QuitarNodo (Nodo ** start, int ID);
 void MostrarLista (Nodo ** start);
+Nodo * BuscarDatoAId (Nodo ** start, int idAbuscar);
+Nodo * BuscarDatoConPalabra (Nodo ** start, char* palabra);
+void MostrarTarea (Nodo * tarea);
+void LiberarLista(Nodo ** start);
 
 int main ()
 {
     char buff[50];
-    char opcion;
-    int duracion, ID = 1000, idBuscado;
+    char opcion, palabra[15];
+    int duracion, ID = 1000, idBuscado, busqueda, idABuscar;
     Nodo * listaPendientes = CrearListaVacia();
     Nodo * listaRealizadas = CrearListaVacia();
     
@@ -61,6 +64,56 @@ int main ()
     MostrarLista(&listaPendientes);
     puts("\nLista de tareas realizadas\n");
     MostrarLista(&listaRealizadas);
+    
+    printf("Desea buscar por id(1) o por palabra clave(2):");
+    scanf("%d", &busqueda);
+    
+    if (busqueda == 1)
+    {
+        printf("\nIngrese el id de la tarea a buscar: ");
+        scanf("%d", &idABuscar);
+        Nodo * TareaBuscada;
+        TareaBuscada = BuscarDatoAId(&listaPendientes, idABuscar);
+        if (TareaBuscada != NULL)
+        {
+            printf("Tarea encontrada en pendientes:");
+            MostrarTarea(TareaBuscada);
+        }
+        TareaBuscada = BuscarDatoAId(&listaRealizadas, idABuscar);
+        if (TareaBuscada != NULL)
+        {
+            printf("Tarea encontrada en realizadas: ");
+            MostrarTarea(TareaBuscada);
+        }
+        
+        
+    } else if (busqueda == 2)
+    {
+        printf("\nIngrese la palabra de la tarea a buscar: ");
+        fflush(stdin);
+        gets(palabra);
+        Nodo * TareaBuscada;
+        TareaBuscada = BuscarDatoConPalabra(&listaPendientes, palabra);
+        if (TareaBuscada != NULL)
+        {
+            printf("Tarea encontrada en pendientes: ");
+            MostrarTarea(TareaBuscada);
+        }
+        TareaBuscada = BuscarDatoConPalabra(&listaRealizadas, palabra);
+        if (TareaBuscada != NULL)
+        {
+            printf("Tarea encontrada en realizadas: ");
+            MostrarTarea(TareaBuscada);
+        } /*else {
+            printf("La palabra ingresada no fue encontrada");
+        }*/
+    } else
+    {
+        printf("\nopcion no valida");
+    }
+    
+    LiberarLista(&listaPendientes);
+    LiberarLista(&listaRealizadas);
     
     return 0;
 }
@@ -111,9 +164,55 @@ void MostrarLista (Nodo ** start)
     Nodo * Aux = *start;
     while (Aux)
     {
-        printf("ID de la tarea: %d\n", Aux->T.TareaId);
-        printf("Descripcion de la tarea: %s\n", Aux->T.Descripcion);
-        printf("Duracion de la tarea: %d\n", Aux->T.Duracion);
+        MostrarTarea(Aux);
         Aux = Aux->Siguiente;
     }
+}
+
+Nodo * BuscarDatoAId (Nodo ** start, int idAbuscar)
+{
+    Nodo * Aux = *start;
+    while (Aux && Aux->T.TareaId != idAbuscar)
+    {
+        Aux = Aux->Siguiente;
+    }
+    return Aux;
+}
+
+Nodo * BuscarDatoConPalabra (Nodo ** start, char* palabra)
+{
+    Nodo * Aux = *start;
+    while (Aux && strstr(Aux->T.Descripcion, palabra) == NULL)
+    {
+        Aux = Aux->Siguiente;
+    }
+    return Aux;
+}
+
+void MostrarTarea (Nodo * tarea)
+{
+    if (tarea != NULL)
+    {
+        printf("\n");
+        printf("ID de la tarea: %d\n", tarea->T.TareaId);
+        printf("Descripcion de la tarea: %s\n", tarea->T.Descripcion);
+        printf("Duracion de la tarea: %d\n", tarea->T.Duracion);
+    }
+    
+}
+
+void LiberarLista(Nodo ** start)
+{
+    Nodo *actual = *start;
+    Nodo *temp;
+
+    while (actual != NULL)
+    {
+        temp = actual;
+        actual = actual->Siguiente;
+
+        free(temp->T.Descripcion);
+        free(temp);
+    }
+    *start = NULL;
 }
